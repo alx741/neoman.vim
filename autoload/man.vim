@@ -58,7 +58,7 @@ function man#get_page(...) abort
 	endif
 
 	silent exec editcmd.' man://'.page.(empty(sect)?'':'('.sect.')')
-
+	setlocal modifiable
 	silent keepjumps norm! 1G"_dG
 	let $MANWIDTH = winwidth(0)
 	silent exec 'r!/usr/bin/man '.s:cmd(sect, page).' | col -b'
@@ -138,4 +138,32 @@ function s:find_page(sect, page) abort
 endfunction
 
 function! man#Complete(ArgLead, CmdLine, CursorPos)
+	let l:args = split(a:CmdLine)
+	let l:len = len(l:args)
+	if l:len == 1
+		let l:page = ""
+		let l:sect = ""
+	elseif l:len == 2
+		if empty(a:ArgLead)
+			let l:page = ""
+			let l:sect = l:args[1]
+		else
+			let l:page = l:args[1]
+			let l:sect = ""
+		endif
+	else
+		let l:page = l:args[2]
+		let l:sect = l:args[1]
+	endif
+	let l:mandirs = split($MANPATH, ':')
+	let l:candidates = []
+	for d in l:mandirs	
+		let l:candidates += globpath(d, "**/" . l:page . "*." . l:sect, 0, 1)
+	endfor
+	let l:i = 0
+	while i < len(l:candidates)
+		let l:candidates[i] = fnamemodify(l:candidates[l:i], ":t")
+		let l:i += 1
+	endwhile
+	return l:candidates
 endfunction
