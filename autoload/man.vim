@@ -136,3 +136,6 @@ function s:find_page(sect, page) abort
 	endif
 	return 1
 endfunction
+
+function! man#Complete(ArgLead, CmdLine, CursorPos)
+endfunction
