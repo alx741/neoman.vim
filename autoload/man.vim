@@ -161,9 +161,16 @@ function! man#Complete(ArgLead, CmdLine, CursorPos)
 		let l:candidates += globpath(d, "**/" . l:page . "*." . l:sect, 0, 1)
 	endfor
 	let l:i = 0
-	while i < len(l:candidates)
-		let l:candidates[i] = fnamemodify(l:candidates[l:i], ":t")
-		let l:i += 1
-	endwhile
+	if l:sect ==# "*"
+		while i < len(l:candidates)
+			let l:candidates[l:i] = fnamemodify(l:candidates[l:i], ":t")
+			let l:i += 1
+		endwhile
+	else
+		while i < len(l:candidates)
+			let l:candidates[l:i] = split(fnamemodify(l:candidates[l:i], ":t"), "\\\.")[0]
+			let l:i += 1
+		endwhile
+	endif
 	return l:candidates
 endfunction
