@@ -165,15 +165,5 @@ function! man#Complete(ArgLead, CmdLine, CursorPos)
 		let l:candidates[i] = fnamemodify(l:candidates[l:i], ":t")
 		let l:i += 1
 	endwhile
-	return sort(l:candidates, "s:sort")
-endfunction
-
-function! s:sort(str1, str2)
-	if len(a:str1) > len(a:str2) 
-		return 1
-	elseif len(a:str1) < len(a:str2)
-		return -1
-	else 
-		return 0
-	endif
+	return l:candidates
 endfunction
