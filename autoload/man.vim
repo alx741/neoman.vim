@@ -12,7 +12,6 @@ catch /E145:/
 endtry
 
 function man#get_page(...) abort
-	let invoked_from_man = (&filetype ==# 'man')
 	if a:0 == 0
 		echoerr 'argument required'
 		return
@@ -20,9 +19,15 @@ function man#get_page(...) abort
 		echoerr 'too many arguments'
 		return
 	elseif a:0 == 2
-		let [page, sect] = [a:2, a:1]
+		let [page, sect] = [a:2, 0 + a:1]
+	elseif type(1) == type(a:1)
+		let [page, sect] = ['<cword>', a:1]
 	else
 		let [page, sect] = [a:1, '']
+	endif
+
+	if page == '<cword>'
+		let page = expand('<cword>')
 	endif
 	let [page, sect] = s:parse_page_and_section(sect, page)
 	if s:find_page(sect, page) == 0
@@ -64,6 +69,20 @@ function man#get_page(...) abort
 	while getline('$') =~ '^\s*$'
 		silent keepjumps norm! G"_dd
 	endwhile
+
+	setlocal nomodified
+	setlocal filetype=man
+	setlocal readonly
+	setlocal nomodifiable
+	setlocal number
+	setlocal noexpandtab
+	setlocal tabstop=8
+	setlocal softtabstop=8
+	setlocal shiftwidth=8
+	setlocal nolist
+	setlocal foldcolumn=0
+	setlocal colorcolumn=0
+	nnoremap <silent> <buffer> q :q<CR>
 	return 0
 endfunction
 
