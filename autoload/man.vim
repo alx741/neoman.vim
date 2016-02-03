@@ -142,14 +142,14 @@ function! man#Complete(ArgLead, CmdLine, CursorPos)
 	let l:len = len(l:args)
 	if l:len == 1
 		let l:page = ""
-		let l:sect = ""
+		let l:sect = "*"
 	elseif l:len == 2
 		if empty(a:ArgLead)
-			let l:page = ""
+			let l:page = "*"
 			let l:sect = l:args[1]
 		else
 			let l:page = l:args[1]
-			let l:sect = ""
+			let l:sect = "*"
 		endif
 	else
 		let l:page = l:args[2]
@@ -165,5 +165,15 @@ function! man#Complete(ArgLead, CmdLine, CursorPos)
 		let l:candidates[i] = fnamemodify(l:candidates[l:i], ":t")
 		let l:i += 1
 	endwhile
-	return l:candidates
+	return sort(l:candidates, "s:sort")
+endfunction
+
+function! s:sort(str1, str2)
+	if len(a:str1) > len(a:str2) 
+		return 1
+	elseif len(a:str1) < len(a:str2)
+		return -1
+	else 
+		return 0
+	endif
 endfunction
