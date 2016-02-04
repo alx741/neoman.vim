@@ -12,22 +12,19 @@ catch /E145:/
 endtry
 
 function neoman#get_page(...) abort
-	let term = 0
 	if a:0 > 2
 		echoerr 'too many arguments'
 		return
 	elseif a:0 == 1
-		let term = 1
 		let [page, sect] = [a:1, '']
 	elseif a:0 == 2
-		let term = 1
 		let [page, sect] = [a:2, a:1]
 	else
 		let [page, sect] = [expand('<cWORD>'), '']
 	endif
 
 	let [page, sect] = s:parse_page_and_section(sect, page)
-	if !term && s:find_page(sect, page)
+	if s:find_page(sect, page)
 		echo 'No manual entry for '.page
 		return 1
 	endif
@@ -36,13 +33,13 @@ function neoman#get_page(...) abort
 	exec 'let s:man_tag_col_'.s:man_tag_depth.' = '.col('.')
 	let s:man_tag_depth = s:man_tag_depth + 1
 
-	if &filetype !=# 'man'
+	if &filetype !=# 'neoman'
 		let thiswin = winnr()
 		wincmd b
 		if winnr() > 1
 			exe "norm! " . thiswin . "<C-W>w"
 			while 1
-				if &filetype == 'man'
+				if &filetype == 'neoman'
 					break
 				endif
 				wincmd w
@@ -65,7 +62,7 @@ function neoman#get_page(...) abort
 	while getline('$') =~ '^\s*$'
 		silent keepjumps norm! G"_dd
 	endwhile
-	setlocal filetype=man
+	setlocal filetype=neoman
 	return 0
 endfunction
 
