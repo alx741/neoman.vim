@@ -12,7 +12,7 @@ else
 endif
 
 syn case ignore
-syn match  manReference       "\f\+([1-9][a-z]\=)"
+syn match  manReference       "\*\?\f\+([1-9][a-z]\=)"
 syn match  manTitle	      "^\f\+([0-9]\+[a-z]\=).*"
 syn match  manSectionHeading  "^[a-z][a-z ]*[a-z]$"
 syn match  manSubHeading      "^\s\{3\}[a-z][a-z ]*[a-z]$"
