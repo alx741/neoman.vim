@@ -11,26 +11,23 @@ catch /E145:/
 	" Ignore the error in restricted mode
 endtry
 
-function man#get_page(...) abort
-	if a:0 == 0
-		echoerr 'argument required'
-		return
-	elseif a:0 > 2
+function neoman#get_page(...) abort
+	let term = 0
+	if a:0 > 2
 		echoerr 'too many arguments'
 		return
-	elseif a:0 == 2
-		let [page, sect] = [a:2, 0 + a:1]
-	elseif type(1) == type(a:1)
-		let [page, sect] = ['<cword>', a:1]
-	else
+	elseif a:0 == 1
+		let term = 1
 		let [page, sect] = [a:1, '']
+	elseif a:0 == 2
+		let term = 1
+		let [page, sect] = [a:2, a:1]
+	else
+		let [page, sect] = [expand('<cWORD>'), '']
 	endif
 
-	if page == '<cword>'
-		let page = expand('<cword>')
-	endif
 	let [page, sect] = s:parse_page_and_section(sect, page)
-	if s:find_page(sect, page) == 0
+	if !term && s:find_page(sect, page)
 		echo 'No manual entry for '.page
 		return 1
 	endif
@@ -39,7 +36,6 @@ function man#get_page(...) abort
 	exec 'let s:man_tag_col_'.s:man_tag_depth.' = '.col('.')
 	let s:man_tag_depth = s:man_tag_depth + 1
 
-	let editcmd = 'edit'
 	if &filetype !=# 'man'
 		let thiswin = winnr()
 		wincmd b
@@ -57,7 +53,7 @@ function man#get_page(...) abort
 		endif
 	endif
 
-	silent exec editcmd.' man://'.page.(empty(sect)?'':'('.sect.')')
+	silent exec 'edit man://'.page.(empty(sect)?'':'('.sect.')')
 	setlocal modifiable
 	silent keepjumps norm! 1G"_dG
 	let $MANWIDTH = winwidth(0)
@@ -69,24 +65,11 @@ function man#get_page(...) abort
 	while getline('$') =~ '^\s*$'
 		silent keepjumps norm! G"_dd
 	endwhile
-
-	setlocal nomodified
 	setlocal filetype=man
-	setlocal readonly
-	setlocal nomodifiable
-	setlocal number
-	setlocal noexpandtab
-	setlocal tabstop=8
-	setlocal softtabstop=8
-	setlocal shiftwidth=8
-	setlocal nolist
-	setlocal foldcolumn=0
-	setlocal colorcolumn=0
-	nnoremap <silent> <buffer> q :q<CR>
 	return 0
 endfunction
 
-function man#pop_page() abort
+function neoman#pop_page() abort
 	if s:man_tag_depth > 0
 		let s:man_tag_depth = s:man_tag_depth - 1
 		exec "let s:man_tag_buf=s:man_tag_buf_".s:man_tag_depth
@@ -105,23 +88,19 @@ endfunction
 " Expects a string like 'access' or 'access(2)'.
 function s:parse_page_and_section(sect, str) abort
 	try
-		let save_isk = &iskeyword
-		setlocal iskeyword-=(,)
-		let page = substitute(a:str, '(*\(\k\+\).*', '\1', '')
-		let sect = substitute(a:str, '\(\k\+\)(\([^()]*\)).*', '\2', '')
-		if sect == page || -1 == match(sect, '^[0-9 ]\+$')
+		let page = substitute(a:str, '\([a-zA-Z_:0-9.]\+\).*', '\1', '')
+		let sect = substitute(a:str, '[a-zA-Z_:0-9.]\+(\([^()]*\)).*', '\1', '')
+		if sect ==# page
 			let sect = a:sect
 		endif
 	catch
-		let &l:iskeyword = save_isk
-		echoerr 'man.vim: failed to parse: "'.a:str.'"'
+		echoerr 'neoman.vim: failed to parse: "'.a:str.'"'
 	endtry
-
 	return [page, sect]
 endfunction
 
 function s:cmd(sect, page) abort
-	if a:sect > 0
+	if !empty(a:sect)
 		return s:man_sect_arg.' '.a:sect.' '.a:page
 	endif
 	return a:page
@@ -131,25 +110,25 @@ function s:find_page(sect, page) abort
 	let where = system('/usr/bin/man '.s:man_find_arg.' '.s:cmd(a:sect, a:page))
 	if where !~ "^/"
 		if matchstr(where, " [^ ]*$") !~ "^ /"
-			return 0
+			return 1
 		endif
 	endif
-	return 1
+	return 0
 endfunction
 
-function! man#Complete(ArgLead, CmdLine, CursorPos)
+function! neoman#Complete(ArgLead, CmdLine, CursorPos) abort
 	let l:args = split(a:CmdLine)
 	let l:len = len(l:args)
 	if l:len == 1
 		let l:page = ""
-		let l:sect = "*"
+		let l:sect = ""
 	elseif l:len == 2
 		if empty(a:ArgLead)
-			let l:page = "*"
+			let l:page = ""
 			let l:sect = l:args[1]
 		else
 			let l:page = l:args[1]
-			let l:sect = "*"
+			let l:sect = ""
 		endif
 	else
 		let l:page = l:args[2]
@@ -157,19 +136,17 @@ function! man#Complete(ArgLead, CmdLine, CursorPos)
 	endif
 	let l:mandirs = split($MANPATH, ':')
 	let l:candidates = []
-	for d in l:mandirs	
-		let l:candidates += globpath(d, "**/" . l:page . "*." . l:sect, 0, 1)
+	for d in l:mandirs
+		let l:candidates += globpath(d, "**/" . l:page . "*." . l:sect . '*', 0, 1)
 	endfor
 	let l:i = 0
-
-	if l:sect ==# "*"
-		let l:exp = 'fnamemodify(l:candidates[l:i], ":t")'
-	else
-		let l:exp = 'split(fnamemodify(l:candidates[l:i], ":t"), "\\\.")[0]'
-	endif
 	while i < len(l:candidates)
-		let l:candidates[l:i] = eval(l:exp)
+		let l:candidates[l:i] = s:formatFilename(fnamemodify(l:candidates[l:i], ":t"))
 		let l:i += 1
 	endwhile
 	return l:candidates
+endfunction
+
+function! s:formatFilename(name) abort
+	return substitute(a:name, '\(.*\)\.\(.*\)', '\1(\2)', "")
 endfunction

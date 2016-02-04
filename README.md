@@ -6,4 +6,4 @@ read manpages faster than superman!
 
 Autocomplete - DONE
 
-Handle man sections with the alphabet.
+Handle man sections with the alphabet. - DONE
