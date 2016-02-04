@@ -2,8 +2,4 @@
 
 read manpages faster than superman!
 
-#TODO
-
-Autocomplete - DONE
-
-Handle man sections with the alphabet. - DONE
+Thanks to https://github.com/jez/vim-superman for the idea, I took it with the default manpage plugin and built something a bit more complex.
