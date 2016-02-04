@@ -3,7 +3,6 @@ if exists('b:did_ftplugin')
 endif
 let b:did_ftplugin = 1
 
-nnoremap <silent> <buffer> q :q<CR>
 setlocal iskeyword+=\.,-,(,)
 setlocal buftype=nofile noswapfile
 setlocal bufhidden=hide
@@ -24,6 +23,7 @@ if !exists("g:no_plugin_maps") && !exists("g:no_man_maps")
   nnoremap <silent> <buffer> <C-]>    :call neoman#get_page()<CR>
   nnoremap <silent> <buffer> <C-T>    :call neoman#pop_page()<CR>
   nnoremap <silent> <nowait><buffer>  q <C-W>c
+  nnoremap <silent> <buffer> q :q<CR>
   if &keywordprg !=# ':Neoman'
     nnoremap <silent> <buffer> K      :call neoman#get_page()<CR>
   endif

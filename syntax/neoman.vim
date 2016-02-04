@@ -50,5 +50,3 @@ if version >= 508 || !exists("did_man_syn_inits")
 endif
 
 let b:current_syntax = "man"
-
-" vim:ts=8 sts=2 sw=2:
