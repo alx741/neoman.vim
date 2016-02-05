@@ -20,7 +20,7 @@ function neoman#get_page(...) abort
   elseif a:0 == 2
     let [page, sect] = [a:2, a:1]
   else
-    let [page, sect] = [expand('<cWORD>'), '']
+    let [page, sect] = [expand('<cword>'), '']
   endif
 
   let [page, sect] = s:parse_page_and_section(sect, page)
