@@ -12,10 +12,10 @@ else
 endif
 
 syn case ignore
-syn match  manReference       "\*\?\k\+([1-9][a-z]\+)"
+syn match  manReference       "\*\?\k\+([1-9][a-z]*)"
 syn match  manTitle	      "^\f\+([0-9]\+[a-z]\=).*"
 syn match  manSectionHeading  "^[a-z][a-z ]*[a-z]$"
-syn match  manSubHeading      "^\s\{3\}[a-z][a-z ]*[a-z]$"
+syn match  manSubHeading      "^ \{3\}[a-z][a-z ]*[a-z]$"
 syn match  manOptionDesc      "^\s*[+-][a-z0-9]\S*"
 syn match  manLongOptionDesc  "^\s*--[a-z0-9-]\S*"
 " syn match  manHistory		"^[a-z].*last change.*$"
