@@ -136,11 +136,9 @@ function! neoman#Complete(ArgLead, CmdLine, CursorPos) abort
   for d in l:mandirs
     let l:candidates += globpath(d, "**/" . l:page . "*." . l:sect . '*', 0, 1)
   endfor
-  let l:i = 0
-  while i < len(l:candidates)
+  for i in range(len(l:candidates))
     let l:candidates[l:i] = substitute((fnamemodify(l:candidates[l:i], ":t")),
           \ '\(.*\)\.\(.*\)', '\1(\2)', "")
-    let l:i += 1
-  endwhile
+  endfor
   return l:candidates
 endfunction
