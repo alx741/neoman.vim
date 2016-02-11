@@ -4,7 +4,8 @@ endif
 let b:did_ftplugin = 1
 
 setlocal iskeyword+=\.,-,(,),:
-setlocal buftype=nofile noswapfile
+setlocal buftype=nofile
+setlocal noswapfile
 setlocal bufhidden=hide
 setlocal nobuflisted
 setlocal nomodified

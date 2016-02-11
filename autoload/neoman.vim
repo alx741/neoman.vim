@@ -12,15 +12,15 @@ catch /E145:/
 endtry
 
 function neoman#get_page(...) abort
-  if a:0 > 2
-    echoerr 'too many arguments'
+  if a:0 > 3
+    redraws! | echon "neoman: " | echohl ErrorMsg | echon "too many arguments" | echohl None
     return
   elseif a:0 == 1
-    let [page, sect] = [a:1, '']
-  elseif a:0 == 2
-    let [page, sect] = [a:2, a:1]
-  else
     let [page, sect] = [expand('<cword>'), '']
+  elseif a:0 == 2
+    let [page, sect] = [a:2, '']
+  elseif a:0 == 3
+    let [page, sect] = [a:3, a:2]
   endif
 
   let [page, sect] = s:parse_page_and_section(sect, page)
@@ -33,20 +33,22 @@ function neoman#get_page(...) abort
   exec 'let s:man_tag_col_'.s:man_tag_depth.' = '.col('.')
   let s:man_tag_depth = s:man_tag_depth + 1
 
-  if &filetype !=# 'neoman'
-    let thiswin = winnr()
-    wincmd b
-    if winnr() > 1
-      exe "norm! " . thiswin . "<C-W>w"
-      while 1
-        if &filetype == 'neoman'
-          break
-        endif
-        wincmd w
-        if thiswin == winnr()
-          break
-        endif
-      endwhile
+  if g:neoman_current_window == a:1
+    if &filetype !=# 'neoman'
+      let thiswin = winnr()
+      wincmd b
+      if winnr() > 1
+        exe "norm! " . thiswin . "<C-W>w"
+        while 1
+          if &filetype == 'neoman'
+            break
+          endif
+          wincmd w
+          if thiswin == winnr()
+            break
+          endif
+        endwhile
+      endif
     endif
   endif
 
@@ -91,7 +93,7 @@ function s:parse_page_and_section(sect, str) abort
       let sect = a:sect
     endif
   catch
-    echoerr 'neoman.vim: failed to parse: "'.a:str.'"'
+    redraws! | echon "neoman: " | echohl ErrorMsg | echon "failed to parse ".a:str.'"' | echohl None
   endtry
   return [page, sect]
 endfunction
@@ -124,8 +126,18 @@ function! neoman#Complete(ArgLead, CmdLine, CursorPos) abort
       let l:page = ""
       let l:sect = l:args[1]
     else
-      let l:page = l:args[1]
-      let l:sect = ""
+      if a:ArgLead =~# '[^(]('
+        let tmp = split(a:ArgLead, '(')
+        let l:page = tmp[0]
+        if len(tmp) == 1
+          let l:sect = ""
+        else
+          let l:sect = substitute(tmp[1], ')', '', '')
+        endif
+      else
+        let l:page = l:args[1]
+        let l:sect = ""
+      endif
     endif
   else
     let l:page = l:args[2]
