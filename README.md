@@ -16,7 +16,7 @@ Read manpages faster than superman!
 Any plugin manager should work fine.
 
 ```vim
-Plug 'nhooyr/env.vim' "vim-plug
+Plug 'nhooyr/neoman.vim' "vim-plug
 ```
 
 ## Usage
