@@ -2,7 +2,7 @@
 
 Read manpages faster than superman!
 
-![neoman in action](gifs/neoman.gif)
+![neoman in action](http://i.imgur.com/vlV3C5i.gifv)
 
 ## Features
 - Manpage autocompletion
