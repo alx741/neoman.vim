@@ -48,7 +48,7 @@ Or set `g:neoman_current_window` in which case the behaviors are swapped.
 Want to split/vsplit/tabe? Pretty simple.
 
 ```vim
-vsplit | Neoman! 3 printf
+:vsplit | Neoman! 3 printf
 ```
 
 You can very easily make that a custom command or mapping.
