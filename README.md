@@ -127,3 +127,4 @@ Only setting is `g:neoman\_current\_window`. This is explained above in the [com
 TODO:
 -----
 - [ ] Mimic the man command with more than 1 manpage
+- [ ] Vim docs

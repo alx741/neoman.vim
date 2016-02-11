@@ -143,11 +143,15 @@ function! neoman#Complete(ArgLead, CmdLine, CursorPos) abort
     let l:page = l:args[2]
     let l:sect = l:args[1]
   endif
-  let l:mandirs = split($MANPATH, ':')
-  let l:candidates = []
-  for d in l:mandirs
-    let l:candidates += globpath(d, "**/" . l:page . "*." . l:sect . '*', 0, 1)
-  endfor
+  " TODO REPORT BUG WITH THIS CODE
+  " let l:mandirs = split($MANPATH, ':')
+  " let l:candidates = []
+  " for d in l:mandirs
+  "   let l:candidates += glob(d . "**/" . l:page . "*." . l:sect . '*', 0, 1)
+  " endfor
+  let l:mandirs_list = split($MANPATH, ':')
+  let l:mandirs = join(l:mandirs_list, ',')
+  let l:candidates = globpath(l:mandirs, "**/" . l:page . "*." . l:sect . '*', 0, 1)
   for i in range(len(l:candidates))
     let l:candidates[l:i] = substitute((fnamemodify(l:candidates[l:i], ":t")),
           \ '\(.*\)\.\(.*\)', '\1(\2)', "")
